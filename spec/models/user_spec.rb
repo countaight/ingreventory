@@ -12,7 +12,7 @@ RSpec.describe User, type: :model do
 
 	it "is invalid without unique username" do
 		user = create(:user)
-		expect(build(:user, username: "genericUsername").save).to be false
+		expect(build(:user, username: user.username).save).to be false
 	end
 
 	it "is invalid without an email" do
@@ -21,7 +21,7 @@ RSpec.describe User, type: :model do
 
 	it "is invalid without a unique email address" do
 		user = create(:user)
-		expect(build(:user, email: "user@name.com").save).to be false
+		expect(build(:user, email: user.email).save).to be false
 	end
 
 end
