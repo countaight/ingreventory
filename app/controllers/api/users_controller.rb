@@ -12,9 +12,9 @@ class Api::UsersController < ApplicationController
 		@user = User.create(user_params)
 
 		if @user.save
-			render json: @user, status: :created
+			render status: :created
 		else
-			render json: @user.errors, status: :bad
+			render json: @user.errors, status: :unprocessable_entity
 		end
 	end
 

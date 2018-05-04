@@ -13,6 +13,10 @@ RSpec.describe Api::UsersController, type: :request do
 			expect(response.content_type).to eq("application/json")
 		end
 
+		it "returns status code 200" do
+			expect(response).to have_http_status(200)
+		end
+
 		it "returns all users" do
 			expect(json.size).to eq(5)
 		end
@@ -40,6 +44,16 @@ RSpec.describe Api::UsersController, type: :request do
 			expect {
 				post "/api/users", params: user_attributes
 			}.to change(User, :count).by(1)
+
+			expect(response.status).to eq(201)
+		end
+
+		it "returns an error with an invalid user" do
+			expect {
+				post "/api/users", params: { user: "wrong params" }
+			}.to_not change(User, :count)
+
+			expect(response.status).to eq(422)
 		end
 
 	end
