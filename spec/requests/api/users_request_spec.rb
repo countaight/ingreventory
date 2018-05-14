@@ -25,35 +25,72 @@ RSpec.describe Api::UsersController, type: :request do
 
 	describe "GET show" do
 
-		before { get "/api/users/#{user.id}" }
+		context "valid user" do
 
-		it "returns JSON" do
-			expect(response.content_type).to eq("application/json")
+			before { get "/api/users/#{user.id}" }
+
+			it "returns JSON" do
+				expect(response.content_type).to eq("application/json")
+			end
+
+			it "returns the correct user" do
+				expect(json["id"]).to eq(user.id)
+			end
+
 		end
 
-		it "returns the correct user" do
-			expect(json["id"]).to eq(user.id)
+		context "invalid user" do
+
+			before { get "/api/users/0" }
+
+			it "returns JSON" do
+				expect(response.content_type).to eq("application/json")
+			end
+
+			it "returns status code 404" do
+				expect(response).to have_http_status(404)
+			end
+
 		end
 
 	end
 
 	describe "POST create" do
 
-		it "creates a new user with valid parameters" do
-			user_attributes = attributes_for :user
-			expect {
-				post "/api/users", params: user_attributes
-			}.to change(User, :count).by(1)
+		context "with a valid user" do
 
-			expect(response.status).to eq(201)
+			it "returns a successful status (201) if properly created" do
+				user_attributes = attributes_for :user
+				expect {
+					post "/api/users", params: user_attributes
+				}.to change(User, :count).by(1)
+
+				expect(response.status).to eq(201)
+			end
+
+			it "returns a successfully created json" do
+				user_attributes = attributes_for :user
+				post "/api/users", params: user_attributes
+				expect(json["username"]).to eq(user_attributes[:username])
+			end
+
 		end
 
-		it "returns an error with an invalid user" do
-			expect {
-				post "/api/users", params: { user: "wrong params" }
-			}.to_not change(User, :count)
+		context "with an invalid user" do
 
-			expect(response.status).to eq(422)
+			it "returns an error with an invalid user" do
+				expect {
+					post "/api/users", params: { user: "wrong params" }
+				}.to_not change(User, :count)
+
+				expect(response.status).to eq(422)
+			end
+
+			it "returns json with errors" do
+				post "/api/users", params: { user: "wrong params" }
+				expect(json["errors"]).to_not be_empty
+			end
+
 		end
 
 	end
